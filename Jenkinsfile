@@ -20,7 +20,7 @@ pipeline {
 
         stage('Deploy Flask App') {
             steps {
-                sh 'chmod +x deploy.sh'
+                sh 'chmod +x scripts/deploy.sh'
                 sh './scripts/deploy.sh'
             }
         }
@@ -55,7 +55,7 @@ pipeline {
     }
     post {
         always {
-            sh 'chmod +x kill.sh'
+            sh 'chmod +x scripts/kill.sh'
             sh './scripts/kill.sh || true'  // Allow the script to continue even if pkill fails
             cleanWs()
         }
