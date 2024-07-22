@@ -22,7 +22,7 @@ pipeline {
                         ${SONARQUBE_SCANNER}/bin/sonar-scanner \
                         -Dsonar.projectKey=SSDPractice \
                         -Dsonar.sources=. \
-                        -Dsonar.exclusions=venv/** \
+                        -Dsonar.exclusions=venv/**,dependency-check-report.html,dependency-check-report.xml,pom.xml \
                         -Dsonar.host.url=${SONARQUBE_URL} \
                         -Dsonar.token=${SONARQUBE_TOKEN} \
                         -Dsonar.python.version=3.9
