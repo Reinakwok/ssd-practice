@@ -3,11 +3,32 @@ pipeline {
     environment {
         NVD_API_KEY = credentials('NVD-API-KEY')
         CHROME_DRIVER_PATH = "./chromedriver"
+        SONARQUBE_URL = 'http://192.168.160.2:9000'
+        SONARQUBE_SCANNER = tool name: 'sonar-scanner'
+        SONARQUBE_TOKEN = credentials('SONARQUBE_TOKEN')
+        SONARQUBE_PROJECT_KEY = 'SSDPractice'
     }
     stages {
         stage('Checkout SCM') {
             steps {
                 git url: 'https://github.com/Reinakwok/ssd-practice.git', branch: 'master'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv('SonarQube') {
+                        sh '''
+                        ${SONARQUBE_SCANNER}/bin/sonar-scanner \
+                        -Dsonar.projectKey=${SONARQUBE_PROJECT_KEY} \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=${SONARQUBE_URL} \
+                        -Dsonar.token=${SONARQUBE_TOKEN} \
+                        -Dsonar.python.version=3.9
+                        '''
+                    }
+                }
             }
         }
 
@@ -18,31 +39,31 @@ pipeline {
         //     }
         // }
 
-        stage('Deploy Flask App') {
-            steps {
-                script {
-                    sh 'chmod +x scripts/deploy.sh'
-                    sh 'chmod +x scripts/kill.sh'
-                    sh './scripts/deploy.sh'
-                    input message: 'Finished using the web site? (Click "Proceed" to continue)'
-                    sh './scripts/kill.sh'
-                }
-            }
-        }
+        // stage('Deploy Flask App') {
+        //     steps {
+        //         script {
+        //             sh 'chmod +x scripts/deploy.sh'
+        //             sh 'chmod +x scripts/kill.sh'
+        //             sh './scripts/deploy.sh'
+        //             input message: 'Finished using the web site? (Click "Proceed" to continue)'
+        //             sh './scripts/kill.sh'
+        //         }
+        //     }
+        // }
 
-        stage('OWASP Dependency Check') {
-            steps {
-                script {
-                    // Run OWASP Dependency Check
-                    dependencyCheck additionalArguments: '--format HTML --format XML', odcInstallation: 'owasp'
-                }
-            }
-            post {
-                success {
-                    dependencyCheckPublisher pattern: 'dependency-check-report.xml'
-                }
-            }
-        }
+        // stage('OWASP Dependency Check') {
+        //     steps {
+        //         script {
+        //             // Run OWASP Dependency Check
+        //             dependencyCheck additionalArguments: '--format HTML --format XML', odcInstallation: 'owasp'
+        //         }
+        //     }
+        //     post {
+        //         success {
+        //             dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+        //         }
+        //     }
+        // }
 
         // stage('Run UI Tests') {
         //     agent {

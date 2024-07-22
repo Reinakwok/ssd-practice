@@ -75,13 +75,10 @@ services:
         - jenkins
 
   flask:
-    build: .
+    build: ./myapp/
     container_name: flask_container
     ports:
-      - "5001:5000"
-    volumes:
-      - .:/app
-    command: flask run --host=0.0.0.0
+      - "10000:10000"
 
 volumes:
     jenkins-data-mock:
