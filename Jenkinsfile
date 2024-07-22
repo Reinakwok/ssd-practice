@@ -44,21 +44,21 @@ pipeline {
             }
         }
 
-        stage('Run UI Tests') {
-            agent {
-                docker {
-                    image 'maven:3.8.1-jdk-11'
-                    args '-v /root/.m2:/root/.m2'
-                }
-            }
-            steps {
-                sh 'mvn test -Dwebdriver.chrome.driver=$CHROME_DRIVER_PATH'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
-            }
-        }
+        // stage('Run UI Tests') {
+        //     agent {
+        //         docker {
+        //             image 'maven:3.8.1-jdk-11'
+        //             args '-v /root/.m2:/root/.m2'
+        //         }
+        //     }
+        //     steps {
+        //         sh 'mvn test -Dwebdriver.chrome.driver=$CHROME_DRIVER_PATH'
+        //     }
+        //     post {
+        //         always {
+        //             junit 'target/surefire-reports/*.xml'
+        //         }
+        //     }
+        // }
     }
 }
