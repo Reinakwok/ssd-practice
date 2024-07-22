@@ -13,8 +13,8 @@ pipeline {
 
         stage('Setup Python Environment') {
             steps {
-                sh 'python -m venv venv'
-                sh './venv/bin/pip install -r requirements.txt'
+                sh 'python -m myenv venv'
+                sh './myenv/bin/pip install -r requirements.txt'
             }
         }
 
