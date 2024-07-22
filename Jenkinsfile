@@ -1,5 +1,5 @@
 pipeline {
-    agent none
+    agent any
     environment {
         NVD_API_KEY = credentials('NVD-API-KEY')
         // APP_URL = "http://localhost:5000"
@@ -7,7 +7,6 @@ pipeline {
     }
     stages {
         stage('Checkout SCM') {
-            agent any
             steps {
                 git url: 'https://github.com/Reinakwok/ssd-practice.git', branch: 'master'
             }
