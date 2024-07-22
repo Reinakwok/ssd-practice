@@ -2,7 +2,7 @@ services:
 
   jenkins-blueocean:
     build:
-       ./Jenkins
+       ./jenkins
     container_name: jenkins-blueocean
     networks:
       - jenkins

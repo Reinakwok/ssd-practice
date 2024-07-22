@@ -5,6 +5,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -15,9 +16,11 @@ public class AppTest {
 
     @Before
     public void setUp() {
-        // Set the path to your ChromeDriver executable
-        System.setProperty("webdriver.chrome.driver", "/path/to/chromedriver");
-        driver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");  // Run in headless mode
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        driver = new ChromeDriver(options);
         driver.get("http://172.24.0.1/index.php");
     }
 
