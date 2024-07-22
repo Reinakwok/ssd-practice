@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 set -x
-docker run -d -p 80:80 --name my-apache-php-app -v "C:\Users\reina\Documents\SIT\Year2\Tri3\ICT2216 Secure Software Development\Labs\ssd-practice/src:/var/www/html" php:7.2-apache
+docker run -d -p 80:80 --name my-apache-php-app -v "C:\Users\reina\Documents\SIT\Year2\Tri3\ICT2216 Secure Software Development\Labs\mock-quiz/src:/var/www/html" php:7.2-apache
 sleep 1
 set +x
 
