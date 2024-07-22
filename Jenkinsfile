@@ -2,8 +2,7 @@ pipeline {
     agent any
     environment {
         NVD_API_KEY = credentials('NVD-API-KEY')
-        // APP_URL = "http://localhost:5000"
-        // CHROME_DRIVER_PATH = "/chromedriver"
+        CHROME_DRIVER_PATH = "./chromedriver"  // Specify your ChromeDriver path here
     }
     stages {
         stage('Checkout SCM') {
@@ -12,22 +11,23 @@ pipeline {
             }
         }
 
-         stage('Setup Python Environment') {
+        stage('Setup Python Environment') {
             steps {
                 sh 'python -m venv venv'
                 sh './venv/bin/pip install -r requirements.txt'
             }
         }
 
-        stage('Run Flask App') {
+        stage('Deploy Flask App') {
             steps {
-                sh 'nohup ./venv/bin/python app.py &'
+                sh 'chmod +x deploy.sh'
+                sh './scripts/deploy.sh'
             }
         }
 
         stage('OWASP Dependency Check') {
             steps {
-                dependencyCheck additionalArguments: '--format HTML --format XML', odcInstallation: 'owasp'
+                sh 'dependency-check --project MyProject --scan . --format HTML --format XML'
             }
             post {
                 success {
@@ -35,6 +35,7 @@ pipeline {
                 }
             }
         }
+
         stage('Run UI Tests') {
             agent {
                 docker {
@@ -50,6 +51,13 @@ pipeline {
                     junit 'target/surefire-reports/*.xml'
                 }
             }
+        }
+    }
+    post {
+        always {
+            sh 'chmod +x kill.sh'
+            sh './scripts/kill.sh || true'  // Allow the script to continue even if pkill fails
+            cleanWs()
         }
     }
 }
