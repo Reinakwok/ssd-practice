@@ -5,7 +5,7 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
 # Load common passwords
-with open('10_million_password_list.txt') as f:
+with open('10-million-password-list-top-1000.txt') as f:
     common_passwords = set(f.read().splitlines())
 
 # OWASP Proactive Controls C6: Enforce password complexity
