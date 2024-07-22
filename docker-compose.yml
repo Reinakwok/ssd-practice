@@ -74,6 +74,16 @@ services:
     networks:
         - jenkins
 
+  python-app:
+    image: python:3.8-slim
+    container_name: python-app
+    networks:
+      - jenkins
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: bash -c "pip install -r requirements.txt && flask run --host=0.0.0.0"
+
 volumes:
     jenkins-data-mock:
         name: jenkins-data-mock
@@ -82,10 +92,9 @@ volumes:
     sonarqube_data:
         name: sonarqube_data
     sonarqube_extensions:
-        name: qube_extensions
+        name: sonarqube_extensions
     sonarqube_logs:
         name: sonarqube_logs
 
 networks:
   jenkins:
-

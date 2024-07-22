@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         NVD_API_KEY = credentials('NVD-API-KEY')
-        CHROME_DRIVER_PATH = "./chromedriver"  // Specify your ChromeDriver path here
+        CHROME_DRIVER_PATH = "./chromedriver"
     }
     stages {
         stage('Checkout SCM') {
@@ -11,32 +11,21 @@ pipeline {
             }
         }
 
-        // stage('Setup Python Environment') {
-        //     steps {
-        //         sh 'python -m venv venv'
-        //         sh './venv/bin/pip install -r requirements.txt'
-        //     }
-        // }
-
-        stage('Integration UI Test') {
-            parallel {
-                stage('Deploy') {
-                    steps {
-                        script {
-                            sh 'chmod +x scripts/deploy.sh'
-                            sh 'chmod +x scripts/kill.sh'
-                            sh './scripts/deploy.sh'
-                            input message: 'Finished using the web site? (Click "Proceed" to continue)'
-                            sh './scripts/kill.sh'
-                        }
-                    }
+        stage('Build and Deploy Python App') {
+            steps {
+                script {
+                    // Build and run the Python app using Docker Compose
+                    sh 'docker-compose up -d python-app'
                 }
             }
         }
-        
+
         stage('OWASP Dependency Check') {
             steps {
-                sh 'dependency-check --project MyProject --scan . --format HTML --format XML'
+                script {
+                    // Run OWASP Dependency Check
+                    dependencyCheck additionalArguments: '--format HTML --format XML', odcInstallation: 'owasp'
+                }
             }
             post {
                 success {
@@ -60,13 +49,6 @@ pipeline {
                     junit 'target/surefire-reports/*.xml'
                 }
             }
-        }
-    }
-    post {
-        always {
-            sh 'chmod +x scripts/kill.sh'
-            sh './scripts/kill.sh || true'  // Allow the script to continue even if pkill fails
-            cleanWs()
         }
     }
 }
