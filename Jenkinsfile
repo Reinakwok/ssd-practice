@@ -11,11 +11,21 @@ pipeline {
             }
         }
 
-         stage('Build and Deploy Python App') {
+        stage('Setup Python Environment') {
+            steps {
+                sh 'python -m venv venv'
+                sh './venv/bin/pip install -r requirements.txt'
+            }
+        }
+
+        stage('Deploy Flask App') {
             steps {
                 script {
-                    // Use a Docker container with Docker Compose to build and run the Python app
-                    sh 'docker run --rm -v $PWD:/workspace -w /workspace docker/compose:1.29.2 up -d python-app'
+                    sh 'chmod +x scripts/deploy.sh'
+                    sh 'chmod +x scripts/kill.sh'
+                    sh './scripts/deploy.sh'
+                    input message: 'Finished using the web site? (Click "Proceed" to continue)'
+                    sh './scripts/kill.sh'
                 }
             }
         }
