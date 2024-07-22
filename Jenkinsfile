@@ -11,12 +11,12 @@ pipeline {
             }
         }
 
-        stage('Setup Python Environment') {
-            steps {
-                sh 'python -m venv venv'
-                sh './venv/bin/pip install -r requirements.txt'
-            }
-        }
+        // stage('Setup Python Environment') {
+        //     steps {
+        //         sh 'python -m venv venv'
+        //         sh './venv/bin/pip install -r requirements.txt'
+        //     }
+        // }
 
         stage('Deploy Flask App') {
             steps {
