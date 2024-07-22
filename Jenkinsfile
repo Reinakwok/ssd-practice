@@ -11,11 +11,11 @@ pipeline {
             }
         }
 
-        stage('Build and Deploy Python App') {
+         stage('Build and Deploy Python App') {
             steps {
                 script {
-                    // Build and run the Python app using Docker Compose
-                    sh 'docker-compose up -d python-app'
+                    // Use a Docker container with Docker Compose to build and run the Python app
+                    sh 'docker run --rm -v $PWD:/workspace -w /workspace docker/compose:1.29.2 up -d python-app'
                 }
             }
         }
