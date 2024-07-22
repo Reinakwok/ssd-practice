@@ -2,7 +2,6 @@ pipeline {
     agent none
     environment {
         NVD_API_KEY = credentials('NVD-API-KEY')
-        // APP_URL = "http://localhost:8080"
     }
     stages {
         stage('Checkout SCM') {
@@ -11,6 +10,20 @@ pipeline {
                 git url: 'https://github.com/Reinakwok/ssd-practice.git', branch: 'master'
             }
         }
+
+         stage('Setup Python Environment') {
+            steps {
+                sh 'python -m venv venv'
+                sh './venv/bin/pip install -r requirements.txt'
+            }
+        }
+
+        stage('Run Flask App') {
+            steps {
+                sh 'nohup ./venv/bin/python app.py &'
+            }
+        }
+
         stage('OWASP Dependency Check') {
             agent any
             steps {
@@ -22,42 +35,19 @@ pipeline {
                 }
             }
         }
-        stage('Integration UI Test') {
-            parallel {
-                stage('Deploy') {
-                    agent any
-                    steps {
-                        script {
-                            // sh 'chmod +x jenkins/scripts/deploy.sh'
-                            // sh 'chmod +x jenkins/scripts/kill.sh'
-                            sh './jenkins/scripts/deploy.sh'
-                            input message: 'Finished using the web site? (Click "Proceed" to continue)'
-                            sh './jenkins/scripts/kill.sh'
-                        }
-                    }
+        stage('Run UI Tests') {
+            agent {
+                docker {
+                    image 'maven:3.8.1-jdk-11'
+                    args '-v /root/.m2:/root/.m2'
                 }
-                stage('Headless Browser Test') {
-                    agent {
-                        docker {
-                            image 'maven:3-alpine'
-                            args '-v /root/.m2:/root/.m2'
-                        }
-                    }
-                    steps {
-                        script {
-                            // Run Maven to clean and package the application
-                            sh 'mvn -B -DskipTests clean package'
-                            // Run UI tests with Selenium
-                            sh 'mvn test'
-                        }
-                    }
-                    post {
-                        always {
-                            script {
-                                junit 'target/surefire-reports/*.xml'
-                            }
-                        }
-                    }
+            }
+            steps {
+                sh 'mvn test -Dwebdriver.chrome.driver=$CHROME_DRIVER_PATH'
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
                 }
             }
         }
