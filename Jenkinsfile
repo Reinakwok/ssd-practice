@@ -18,13 +18,22 @@ pipeline {
         //     }
         // }
 
-        stage('Deploy Flask App') {
-            steps {
-                sh 'chmod +x scripts/deploy.sh'
-                sh './scripts/deploy.sh'
+        stage('Integration UI Test') {
+            parallel {
+                stage('Deploy') {
+                    steps {
+                        script {
+                            sh 'chmod +x scripts/deploy.sh'
+                            sh 'chmod +x scripts/kill.sh'
+                            sh './scripts/deploy.sh'
+                            input message: 'Finished using the web site? (Click "Proceed" to continue)'
+                            sh './scripts/kill.sh'
+                        }
+                    }
+                }
             }
         }
-
+        
         stage('OWASP Dependency Check') {
             steps {
                 sh 'dependency-check --project MyProject --scan . --format HTML --format XML'
