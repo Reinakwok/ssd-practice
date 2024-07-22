@@ -6,7 +6,6 @@ pipeline {
         SONARQUBE_URL = 'http://192.168.160.2:9000'
         SONARQUBE_SCANNER = tool name: 'sonar-scanner'
         SONARQUBE_TOKEN = credentials('SONARQUBE_TOKEN')
-        SONARQUBE_PROJECT_KEY = 'SSDPractice'
     }
     stages {
         stage('Checkout SCM') {
@@ -21,8 +20,9 @@ pipeline {
                     withSonarQubeEnv('SonarQube') {
                         sh '''
                         ${SONARQUBE_SCANNER}/bin/sonar-scanner \
-                        -Dsonar.projectKey=${SONARQUBE_PROJECT_KEY} \
+                        -Dsonar.projectKey=SSDPractice \
                         -Dsonar.sources=. \
+                        -Dsonar.exclusions=venv/** \
                         -Dsonar.host.url=${SONARQUBE_URL} \
                         -Dsonar.token=${SONARQUBE_TOKEN} \
                         -Dsonar.python.version=3.9
