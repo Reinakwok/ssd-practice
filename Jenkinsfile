@@ -2,6 +2,7 @@ pipeline {
     agent none
     environment {
         NVD_API_KEY = credentials('NVD-API-KEY')
+        APP_URL = "http://localhost:5000"
     }
     stages {
         stage('Checkout SCM') {
@@ -12,6 +13,7 @@ pipeline {
         }
 
          stage('Setup Python Environment') {
+            agent any
             steps {
                 sh 'python -m venv venv'
                 sh './venv/bin/pip install -r requirements.txt'
@@ -19,6 +21,7 @@ pipeline {
         }
 
         stage('Run Flask App') {
+            agent any
             steps {
                 sh 'nohup ./venv/bin/python app.py &'
             }
