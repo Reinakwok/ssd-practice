@@ -2,40 +2,33 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import re
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
 
-# Load common passwords
-with open('10-million-password-list-top-1000.txt') as f:
-    common_passwords = set(f.read().splitlines())
+@app.route('/')
+def home():
+    return render_template('home.html')
 
-# OWASP Proactive Controls C6: Enforce password complexity
-password_pattern = re.compile(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[\W]).{8,}$')
+@app.route('/search', methods=['POST'])
+def search():
+    search_term = request.form['search_term']
+    
+    # Validate the input to prevent XSS and SQL Injection attacks
+    if is_xss_attack(search_term):
+        return redirect(url_for('home', message='Invalid input: Potential XSS attack detected. Please try again.'))
+    
+    if is_sql_injection(search_term):
+        return redirect(url_for('home', message='Invalid input: Potential SQL injection detected. Please try again.'))
+    
+    return render_template('result.html', search_term=search_term)
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        password = request.form['password']
-        if password in common_passwords:
-            error = 'Common password detected. Please use a different password.'
-            return render_template('index.html', error=error)
-        elif not password_pattern.match(password):
-            error = 'Password does not meet complexity requirements.'
-            return render_template('index.html', error=error)
-        else:
-            session['password'] = password
-            return redirect(url_for('welcome'))
-    return render_template('index.html')
+def is_xss_attack(input_text):
+    # Basic validation for XSS attack
+    xss_patterns = ['<', '>', 'script', 'alert', '&', ';']
+    return any(pattern in input_text.lower() for pattern in xss_patterns)
 
-@app.route('/welcome')
-def welcome():
-    if 'password' not in session:
-        return redirect(url_for('index'))
-    return render_template('welcome.html', password=session['password'])
-
-@app.route('/logout')
-def logout():
-    session.pop('password', None)
-    return redirect(url_for('index'))
+def is_sql_injection(input_text):
+    # Basic validation for SQL injection
+    sql_patterns = ['\'', '--', '/*', '*/', 'or ', 'and ', 'select ', 'insert ', 'update ', 'delete ', 'drop ']
+    return any(pattern in input_text.lower() for pattern in sql_patterns)
 
 if __name__ == '__main__':
     app.run(debug=True)

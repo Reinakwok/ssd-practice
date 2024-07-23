@@ -14,6 +14,17 @@ pipeline {
             }
         }
 
+        stage('Run Tests') {
+            steps {
+                sh 'pytest --junitxml=test-results.xml'
+            }
+            post {
+                always {
+                    junit 'test-results.xml'
+                }
+            }
+        }
+
         stage('SonarQube Analysis') {
             steps {
                 script {
@@ -32,21 +43,31 @@ pipeline {
             }
         }
 
-        stage('Run UI Tests') {
-            agent {
-                docker {
-                    image 'maven:3.8.1-jdk-11'
-                    args '-v /root/.m2:/root/.m2'
-                }
-            }
-            steps {
-                sh 'mvn test -Dwebdriver.chrome.driver=$CHROME_DRIVER_PATH'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
-            }
-        }
+        // stage('OWASP DependencyCheck') {
+        //     steps {
+        //         dependencyCheck additionalArguments: '--format HTML --format XML', odcInstallation: 'owasp'
+        //     }
+        // }
+
+
+        // stage('Run UI Tests') {
+        //     agent {
+        //         docker {
+        //             image 'maven:3.8.1-jdk-11'
+        //             args '-v /root/.m2:/root/.m2'
+        //         }
+        //     }
+        //     steps {
+        //         sh 'mvn test -Dwebdriver.chrome.driver=$CHROME_DRIVER_PATH'
+        //     }
+        //     post {
+        //         always {
+        //             junit 'target/surefire-reports/*.xml'
+        //         }
+        //     }
+        // }
+
+
+
     }
 }
