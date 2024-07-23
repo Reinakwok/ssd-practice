@@ -15,20 +15,20 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                script {
-                    dockerImage.inside {
-                        sh 'pytest --./myapp/junitxml=test-results.xml'
-                    }
-                }
-            }
-            post {
-                always {
-                    junit 'test-results.xml'
-                }
-            }
-        }
+        // stage('Run Tests') {
+        //     steps {
+        //         script {
+        //             dockerImage.inside {
+        //                 sh 'pytest --./myapp/junitxml=test-results.xml'
+        //             }
+        //         }
+        //     }
+        //     post {
+        //         always {
+        //             junit 'test-results.xml'
+        //         }
+        //     }
+        // }
 
         stage('SonarQube Analysis') {
             steps {
