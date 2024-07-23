@@ -3,8 +3,8 @@ pipeline {
     environment {
         NVD_API_KEY = credentials('NVD-API-KEY')
         CHROME_DRIVER_PATH = "./chromedriver"
-        SONARQUBE_URL = 'http://192.168.160.2:9000'
-        // 192.168.192.2 hotspot ip
+        SONARQUBE_URL = 'http://192.168.224.1:9000'
+        // 192.168.224.1 hotspot ip
         SONARQUBE_SCANNER = tool name: 'sonar-scanner'
         SONARQUBE_TOKEN = credentials('SONARQUBE_TOKEN')
     }
